@@ -1,14 +1,21 @@
-#include <SystemInfo.h>
+#include "SystemInfo.h"
+#include <cstdio>
 
-std::string SystemInfo::getCPUName() {
+CPUInfo SystemInfo::getCPUInfo() {
 	std::ifstream cpuinfo("/proc/cpuinfo");
 	std::string line;
+	CPUInfo cpu_info;
+	cpu_info.model_name = "Unknown CPU";
+	cpu_info.processors = 0;
 	while (std::getline(cpuinfo, line)) {
 		if (line.find("model name") != std::string::npos) {
-			return line.substr(line.find(":") + 2);
+			cpu_info.model_name = line.substr(line.find(":") + 2);
+		}
+		if (line.substr(0, 9) == "processor"){
+			cpu_info.processors += 1;
 		}
 	}
-	return "Unknown CPU";
+	return cpu_info;
 }
 
 std::string SystemInfo::getTotalRAM()
@@ -32,4 +39,23 @@ std::string SystemInfo::getTotalRAM()
 		}
 	}
 	return "Unknown RAM";
+}
+
+std::string SystemInfo::getGPU()
+{
+	std::array<char, 128> buffer;
+	std::string result;
+
+	FILE* pipe = popen("lspci | grep -E -i '(Display|3D|VGA)'", "r");
+	if (!pipe) {
+		return "Error opening pipe";
+	}
+
+	while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+		result += buffer.data();
+	}
+
+	pclose(pipe);
+
+	return result;
 }

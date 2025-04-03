@@ -6,12 +6,20 @@
 #include <fstream>
 #include <sys/sysinfo.h>
 #include <algorithm>
+#include <memory>
+#include <array>
+
+struct CPUInfo {
+	std::string model_name;
+	unsigned int processors;
+};
 
 class SystemInfo
 {
 public:
-	static std::string getCPUName();
+	static CPUInfo getCPUInfo();
 	static std::string getTotalRAM();
+	static std::string getGPU();
 };
 
 #endif /* SYSTEMINFO_H */
