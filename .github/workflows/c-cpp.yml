@@ -1,21 +1,32 @@
-name: C/C++ CI
+name: Build with CMake
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main  # Trigger the workflow on push to the main branch
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main  # Trigger the workflow on pull request to the main branch
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
 
     steps:
-    - uses: actions/checkout@v4
-    - name: build
-      run: mkdir build && cd build
-    - name: generate cmake file
-      run: cmake ..
-    - name: build
-      run: cmake --build .
+    - name: Checkout code
+      uses: actions/checkout@v4  # Checkout the repository code
+
+    - name: Set up CMake
+      uses: actions/setup-cmake@v2  # Set up CMake environment
+
+    - name: Build with CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .  # Build the project
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest  # Run tests (optional)
