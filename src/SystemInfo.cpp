@@ -1,5 +1,45 @@
 #include "SystemInfo.h"
+#include <array>
 #include <cstdio>
+#include <iostream>
+#include <ostream>
+#include <sstream>
+
+std::string SystemInfo::runCommand(const char* command)
+{
+	std::array<char, 128> buffer;
+	std::string result;
+
+	FILE* pipe = popen(command, "r");
+	if (!pipe) {
+		return "Error opening pipe";
+	}
+
+	while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+		std::string line = buffer.data();
+        if (!line.empty() && line.back() == '\n') {
+            line.pop_back(); // Remove the last character if it's '\n'
+        }
+		result += line;
+	}
+
+	pclose(pipe);
+
+	return result;
+}
+
+std::vector<std::string> SystemInfo::split (const std::string &s, char delim)
+{
+    std::vector<std::string> result;
+    std::stringstream ss(s);
+    std::string item;
+
+    while (getline (ss, item, delim)) {
+        result.push_back (item);
+    }
+
+    return result;
+}
 
 CPUInfo SystemInfo::getCPUInfo() {
 	std::ifstream cpuinfo("/proc/cpuinfo");
@@ -43,19 +83,21 @@ std::string SystemInfo::getTotalRAM()
 
 std::string SystemInfo::getGPU()
 {
-	std::array<char, 128> buffer;
-	std::string result;
+	return runCommand("lspci | grep -E -i '(Display|3D|VGA)'");
+}
 
-	FILE* pipe = popen("lspci | grep -E -i '(Display|3D|VGA)'", "r");
-	if (!pipe) {
-		return "Error opening pipe";
-	}
+Time SystemInfo::getUptime()
+{
+	Time uptime;
 
-	while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-		result += buffer.data();
-	}
+	std::string result = runCommand("uptime");
 
-	pclose(pipe);
+	std::vector<std::string> v = split(result, ' ');
+	v[3].erase(v[3].length()-1, 1);
+	std::vector<std::string> time = split(v[3], ':');
 
-	return result;
+	uptime.hours = std::stoi(time[0]);
+	uptime.minutes = std::stoi(time[1]);
+
+	return uptime;
 }
