@@ -28,15 +28,15 @@ std::string SystemInfo::runCommand(const char *command) {
 // Utility function to split a string into a vector using a character as the delimiter
 std::vector<std::string> SystemInfo::split(const std::string &s, char delim)
 {
-    std::vector<std::string> result;
+	std::vector<std::string> result;
 	std::stringstream ss(s);
-    std::string item;
+	std::string item;
 
-    while (getline(ss, item, delim)) {
-        result.push_back(item);
-    }
+	while (getline(ss, item, delim)) {
+		result.push_back(item);
+	}
 
-    return result;
+	return result;
 }
 
 // Get the CPU info as a struct, including its name and its core count
