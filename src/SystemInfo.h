@@ -9,6 +9,9 @@
 #include <memory>
 #include <array>
 #include <vector>
+#include <array>
+#include <cstdio>
+#include <sstream>
 
 struct CPUInfo {
 	std::string model_name;
@@ -20,6 +23,11 @@ struct Time {
 	unsigned int minutes;
 };
 
+struct RAMInfo {
+	std::string total;
+	std::string used;
+};
+
 class SystemInfo
 {
 private:
@@ -28,9 +36,10 @@ private:
 
 public:
 	static CPUInfo getCPUInfo();
-	static std::string getTotalRAM();
+	static RAMInfo getRAMInfo();
 	static std::string getGPU();
 	static Time getUptime();
+	static std::string getShell();
 };
 
 #endif /* SYSTEMINFO_H */
