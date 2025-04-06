@@ -4,7 +4,8 @@
 #include <vector>
 
 // Utility function to run a command from bash and return its result as a string
-std::string SystemInfo::runCommand(const char *command) {
+std::string SystemInfo::runCommand(const char *command) 
+{
 	std::array<char, 128> buffer;
 	std::string result;
 
@@ -42,7 +43,8 @@ std::vector<std::string> SystemInfo::split(const std::string &s, char delim)
 }
 
 // Get the CPU info as a struct, including its name and its core count
-CPUInfo SystemInfo::getCPUInfo() {
+CPUInfo SystemInfo::getCPUInfo() 
+{
 	std::ifstream cpuinfo("/proc/cpuinfo");
 	std::string line;
 	CPUInfo cpu_info = {"Unknown CPU", 0};
@@ -151,6 +153,7 @@ std::string SystemInfo::getDistro()
 	return distro;
 }
 
+// Get Linux kernel type and version
 std::string SystemInfo::getKernel()
 {
 	std::string kernel;
@@ -174,6 +177,7 @@ std::string SystemInfo::getKernel()
 	return kernel;
 }
 
+// Get the hostname and username of the current user
 HostInfo SystemInfo::getHostInfo()
 {
 	HostInfo hostinfo = {"unknown", "unknown"};
