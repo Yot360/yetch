@@ -24,8 +24,14 @@ struct Time {
 };
 
 struct RAMInfo {
-	std::string total;
-	std::string used;
+	unsigned int total;
+	unsigned int used;
+	unsigned int percentage;
+};
+
+struct HostInfo{
+	std::string username;
+	std::string hostname;
 };
 
 class SystemInfo
@@ -40,6 +46,9 @@ public:
 	static std::string getGPU();
 	static Time getUptime();
 	static std::string getShell();
+	static std::string getDistro();
+	static std::string getKernel();
+	static HostInfo getHostInfo();
 };
 
 #endif /* SYSTEMINFO_H */

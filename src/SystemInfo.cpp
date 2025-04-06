@@ -1,4 +1,6 @@
 #include "SystemInfo.h"
+#include <fstream>
+#include <string>
 #include <vector>
 
 // Utility function to run a command from bash and return its result as a string
@@ -43,9 +45,7 @@ std::vector<std::string> SystemInfo::split(const std::string &s, char delim)
 CPUInfo SystemInfo::getCPUInfo() {
 	std::ifstream cpuinfo("/proc/cpuinfo");
 	std::string line;
-	CPUInfo cpu_info;
-	cpu_info.model_name = "Unknown CPU";
-	cpu_info.processors = 0;
+	CPUInfo cpu_info = {"Unknown CPU", 0};
 
 	// Reads /proc/cpuinfo file to find CPU info
 	while (std::getline(cpuinfo, line)) {
@@ -64,10 +64,9 @@ RAMInfo SystemInfo::getRAMInfo()
 {
 	std::ifstream meminfo("/proc/meminfo");
 	std::string line;
-	RAMInfo ram_info;
+	RAMInfo ram_info = {0, 0, 0};
 	unsigned long memTotalKB;
-	ram_info.total = "Unknown";
-	ram_info.used = "Unknown";
+	unsigned long memUsedKB;
 
 	// Reads /proc/meminfo file to find RAM info
 	while (std::getline(meminfo, line)){
@@ -83,7 +82,7 @@ RAMInfo SystemInfo::getRAMInfo()
 
 				memTotalKB = std::stoll(ram); // Converts ram string to an unsigned long
 				int ramMB = static_cast<int>(memTotalKB)/1000; // Converts the RAM count from KB to MB
-				ram_info.total = std::to_string(ramMB) + "MB";
+				ram_info.total = ramMB;
 			}
 		}
 		if (line.find("MemFree") != std::string::npos) { // Checks if the current line has free memory info
@@ -95,12 +94,16 @@ RAMInfo SystemInfo::getRAMInfo()
 				if (kb_pos != std::string::npos){
 					ram.erase(kb_pos);
 				}
-				long ramKB = memTotalKB - std::stoll(ram); // Converts ram string to an unsigned long and calculate used ram by doing total - used
-				int ramMB = static_cast<int>(ramKB)/1000;
-				ram_info.used = std::to_string(ramMB) + "MB";
+				memUsedKB = memTotalKB - std::stoll(ram); // Converts ram string to an unsigned long and calculate used ram by doing total - used
+				int ramMB = static_cast<int>(memUsedKB)/1000;
+				ram_info.used = ramMB;
 			}
 		}
 	}
+
+	// Calculate percentage of used ram our of total ram
+	ram_info.percentage = (100*memUsedKB)/memTotalKB;
+
 	return ram_info;
 }
 
@@ -113,18 +116,18 @@ std::string SystemInfo::getGPU()
 // Get system uptme since boot, returns a struct including hours and minutes elapsed
 Time SystemInfo::getUptime()
 {
-	Time uptime;
+	Time uptime = {0, 0};
+	std::ifstream uptimeF("/proc/uptime");
+	std::string line;
 
-	std::string result = runCommand("uptime");
-
-	// Split the command result correctly to then parse hours and minutes
-	std::vector<std::string> v = split(result, ' ');
-	v[3].erase(v[3].length()-1, 1);
-	std::vector<std::string> time = split(v[3], ':');
-
-	// Converts hours and minutes strings to int
-	uptime.hours = std::stoi(time[0]);
-	uptime.minutes = std::stoi(time[1]);
+	if (std::getline(uptimeF, line)) {
+		std::vector<std::string> v = split(line, ' ');
+		int totalMinutes = std::stoll(v[0])/60;
+		int hours = totalMinutes/60;
+		int minutes = totalMinutes % 60;
+		uptime.hours = hours;
+		uptime.minutes = minutes;
+	}
 
 	return uptime;
 }
@@ -132,7 +135,54 @@ Time SystemInfo::getUptime()
 // Get the shell the user running yetch uses
 std::string SystemInfo::getShell()
 {
-	std::string shell = runCommand("echo $SHELL");
+	std::string shell = "Unknown";
+	shell = runCommand("echo $SHELL");
 	std::vector<std::string> v = split(shell, '/'); // Split the command result to just get the shell name instead of the full path
 	return v[v.size()-1]; // Get last item, aka shell name, and returns it
+}
+
+// Get the Linux distribution
+std::string SystemInfo::getDistro()
+{
+	std::string distro = "Unknown";
+	std::string result = runCommand("lsb_release -i");
+	int npos = result.find("ID:");
+	distro = result.substr(npos+4);
+	return distro;
+}
+
+std::string SystemInfo::getKernel()
+{
+	std::string kernel;
+	std::string result = runCommand("uname -a");
+	std::vector<std::string> v = split(result, ' ');
+
+	v.erase(v.begin()+1); // Removes the hostname from the result
+
+	// Remove erything after the # from the result
+	for (int i = 0; i < v.size(); i++) {
+		if (v[i][0] == '#') {
+			v.erase(v.begin() + i, v.end());
+		}
+	}
+
+	// Remake string from vector
+	for (std::string n : v) {
+		kernel.append(n + " ");
+	}
+
+	return kernel;
+}
+
+HostInfo SystemInfo::getHostInfo()
+{
+	HostInfo hostinfo = {"unknown", "unknown"};
+
+	std::string username = runCommand("whoami");
+	std::string hostname = runCommand("hostname");
+
+	hostinfo.username = username;
+	hostinfo.hostname = hostname;
+
+	return hostinfo;
 }

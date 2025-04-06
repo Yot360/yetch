@@ -2,14 +2,23 @@
 #include "SystemInfo.h"
 int main(int argc, char *argv[])
 {
-	CPUInfo cpuinfo = SystemInfo::getCPUInfo();
-	Time uptime = SystemInfo::getUptime();
-	RAMInfo raminfo = SystemInfo::getRAMInfo();
-	std::cout << "GPU: " << SystemInfo::getGPU() << std::endl;
-	std::cout << "CPU: " << cpuinfo.model_name << std::endl;
-	std::cout << "Cores: " << cpuinfo.processors << std::endl;
-	std::cout << "RAM: " << raminfo.used << "/" << raminfo.total << std::endl;
-	std::cout << "Uptime: " << uptime.hours << " hours and " << uptime.minutes << " minutes" << std::endl;
-	std::cout << "Shell: " << SystemInfo::getShell() << std::endl;
+	const CPUInfo cpuinfo = SystemInfo::getCPUInfo();
+	const Time uptime = SystemInfo::getUptime();
+	const RAMInfo raminfo = SystemInfo::getRAMInfo();
+	const HostInfo hostinfo = SystemInfo::getHostInfo();
+	const std::string gpu = SystemInfo::getGPU();
+	const std::string shell = SystemInfo::getShell();
+	const std::string distro = SystemInfo::getDistro();
+	const std::string kernel = SystemInfo::getKernel();
+
+	std::cout << "╭──[" << hostinfo.username << "@" << hostinfo.hostname << "]──c" << std::endl;
+	std::cout << "│     .--.           " << distro << std::endl;
+	std::cout << "│    |o_o |        󱙤  " << kernel << std::endl;
+	std::cout << "│    |:_/ |          " << shell << std::endl;
+	std::cout << "│   //   \\ \\         " << cpuinfo.model_name << std::endl;
+	std::cout << "│  (|     | )        " << gpu << std::endl;
+	std::cout << "│ /'\\_   _/`\\        " << raminfo.used << "MB/" << raminfo.total << "MB (" << raminfo.percentage << "%)" << std::endl;
+	std::cout << "│ \\___)=(___/        " << uptime.hours << " hours and " << uptime.minutes << " minutes" << std::endl;
+	std::cout << "╰──────────────────────────c" << std::endl;
 	return 0;
 }
