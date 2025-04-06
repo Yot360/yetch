@@ -87,7 +87,7 @@ RAMInfo SystemInfo::getRAMInfo()
 				ram_info.total = ramMB;
 			}
 		}
-		if (line.find("MemFree") != std::string::npos) { // Checks if the current line has free memory info
+		if (line.find("MemAvailable") != std::string::npos) { // Checks if the current line has free memory info
 			size_t pos = line.find(":");
 			if (pos != std::string::npos){
 				std::string ram = line.substr(pos + 1);
