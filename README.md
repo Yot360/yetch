@@ -20,3 +20,6 @@ cmake --build .
 sudo cmake --install .
 ```
 This will install yetch to `/usr/local/bin/yetch` (needs sudo permissions).
+
+## Prebuit binary
+You can find prebuilt binaries in the [Actions tab of the repo](https://github.com/Yot360/yetch/actions).
