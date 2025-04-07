@@ -6,8 +6,8 @@ Made in C++ to make it blazingly fast.
 ![image](https://github.com/user-attachments/assets/bde7c157-fc23-413a-bb90-046f5fc0bd3f)
 
 ## Installing requirements
-To make yetch work you will need the `hostname` command, found in the package `inetutils` and the `lsb_release` found in the `lsb-release` package.
-So, install both packages with your preferred package manager. Exemple with pacman:
+To make yetch work you will need the `hostname` command, found in the package `inetutils` and the `lsb_release` command, found in the `lsb-release` package.
+So, install both packages with your preferred package manager. Example with pacman:
 ```
 sudo pacman -S inetutils lsb-release
 ```
